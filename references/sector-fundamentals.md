@@ -42,6 +42,10 @@
 | **MBB** | Định giá hấp dẫn (P/B thấp), ROE cao, military ecosystem | Value |
 | **ACB** | Bán lẻ vững, chất lượng tín dụng tốt, ổn định | Stable |
 
+### ⚠️ Valuation Warning
+- VCB: đang P/B ~2.5x — không còn rẻ, Sharpe lịch sử thấp (0.08) → cẩn thận
+- Ưu tiên TCB (P/E ~8x, oversold RSI 33) và MBB (P/E ~7x, trên EMA200) hơn VCB hiện tại
+
 ---
 
 ## 2. 💻 Công nghệ (Technology)
@@ -154,10 +158,22 @@
 - **P/E**: ~15x (defensive, stable)
 - **Risk**: Tăng trưởng chậm lại, cạnh tranh từ sữa ngoại nhập
 
-### MSN — Masan Group
+### MCH — Masan Consumer Holdings (con của MSN)
+- **Sản phẩm**: Omachi, Kokomi, Nam Ngư, Chinsu, Wakeup 247
+- **Thị phần**: Mì gói ~60%, nước mắm ~50%, cà phê gói tăng trưởng nhanh
+- **CAGR 3Y**: +73.6%/năm (từ đáy 2023 ~30,000đ → 161,000đ)
+- **Sharpe 2.19** — tốt nhất trong nhóm được phân tích
+
+### ⚠️ MCH — Định Giá Hiện Tại Đã Cao
+- **P/E ước tính**: ~35-40x → **ĐẮT** so với mức fair 20-25x
+- **Giá 161,000đ** đã phản ánh phần lớn câu chuyện tăng trưởng
+- **Sharpe 2.19 là lịch sử từ vùng giá thấp** — không apply cho người mua tại 161k
+- **Estimate thực tế từ giá hiện tại**: Base case 3 năm chỉ ~+30-50% (không phải +423%)
+- **Khi nào mua MCH?** Chờ về vùng 120,000-130,000 (EMA50 test lại) hoặc RSI < 35
+
+### MSN — Masan Group (công ty mẹ)
 - **WinCommerce**: 2,500+ cửa hàng WinMart/WinMart+
 - **MEATDeli**: thịt sạch, thị trường thịt 10B USD
-- **Chinsu**: gia vị thương hiệu mạnh (xuất khẩu Nhật Bản)
 - **Masan High-Tech Materials**: vonfram toàn cầu
 - Thesis: Consumer ecosystem play — "Mỗi bữa ăn của người Việt đều có Masan"
 
