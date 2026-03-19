@@ -604,3 +604,73 @@ Market kỳ vọng cắt lần đầu: Q3/Q4 2026
 
 **→ Chiến lược: Tích lũy MBB + S&P 500 ETF hiện tại, chờ FED cắt lãi suất = catalyst chính**
 
+
+---
+
+## 10. PORTFOLIO REBALANCING — Điều Chỉnh Danh Mục
+
+### 10.1 Khi nào cần rebalance?
+
+- **Tỷ trọng lệch > 10%** so với mục tiêu (VD: FPT từ 30% → 38%)
+- **Macro thay đổi** (FED cắt/tăng lãi suất, suy thoái, chiến tranh)
+- **Fundamental thay đổi** (P/E đột ngột đắt, Sharpe giảm mạnh)
+- **Định kỳ** mỗi 6 tháng — dù thị trường bình thường
+
+### 10.2 Nguyên tắc rebalance
+
+1. **Cắt tài sản đã tăng mạnh** → overweight → bán bớt về target %
+2. **Mua thêm tài sản đang rẻ** → underweight → tăng về target %
+3. **Không bán lỗ để rebalance** nếu fundamental vẫn tốt — chỉ dùng tiền mới
+4. **Dùng DCA hàng tháng để rebalance dần** thay vì all-in một lúc
+
+### 10.3 Framework ra quyết định dựa trên Macro
+
+```
+FED HAWKISH (giữ/tăng lãi suất):
+→ Tích lũy: Vàng, S&P 500 ETF (pre-cut positioning)
+→ Tránh: Crypto, growth stocks (nhạy lãi suất cao)
+→ Ngân hàng VN: neutral (tín dụng khó tăng)
+
+FED DOVISH (cắt lãi suất):
+→ Tích lũy: Crypto (BTC/BNB), S&P 500, Ngân hàng VN
+→ Vàng: có thể chốt lời một phần (USD yếu nhưng có thể điều chỉnh)
+→ MBB/TCB: mua mạnh (NIM cải thiện, tín dụng tăng)
+
+GEOPOLITICAL RISK CAO:
+→ Tăng Vàng, giảm risk assets
+→ Crypto thường giảm trong giai đoạn đầu bất ổn
+
+INFLATION TĂNG:
+→ Vàng, BĐS, hàng hóa (commodity stocks: HPG, GAS)
+→ Giảm trái phiếu, cash
+```
+
+### 10.4 Lesson từ danh mục Eddie (19/03/2026)
+
+**Vấn đề phát hiện:**
+- FPT 38% → overweight, dưới EMA200, downtrend
+- VCB P/E đắt hơn fair value, Sharpe 0.09
+- BNB -51% vì FED hawkish, crypto nhạy lãi suất
+- Thiếu diversification quốc tế (100% VN + Crypto)
+
+**Điều chỉnh đúng:**
+- Cắt VCB (đắt, Sharpe tệ) → Mua MBB (rẻ, Sharpe tốt) + Vàng (hedge)
+- Thêm S&P 500 ETF (trước khi FED cắt = pre-cut positioning)
+- Giữ BNB (không bán lỗ -51%, chờ FED cắt = catalyst recovery)
+- Giảm FPT dần khi giá phục hồi (không bán lúc RSI oversold)
+
+**Catalyst chờ đợi: FED cắt lãi suất Q3/Q4 2026**
+→ Sẽ kích hoạt: BNB +50-100%, S&P 500 +15-20%, MBB +20-30%
+
+### 10.5 Danh mục mục tiêu sau rebalance
+
+| Tài sản | % Mục tiêu | Lý do |
+|---|---|---|
+| MBB | 28% | P/E 7x, FED cut = ngân hàng hưởng lợi |
+| S&P 500 ETF | 14% | Pre-cut positioning, diversification |
+| Vàng | 12% | Hedge hawkish FED, geopolitical risk |
+| FPT | 21% | Giảm concentration, giữ dài hạn |
+| BNB | 15% | Hold, chờ FED cut |
+| VCB | 5% | Giảm mạnh (đắt, Sharpe tệ) |
+| Tiết kiệm | 6% | Emergency fund |
+

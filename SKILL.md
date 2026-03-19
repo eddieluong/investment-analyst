@@ -17,7 +17,24 @@ Sharpe 2.19 là lịch sử từ vùng giá thấp — không apply cho người
 
 ---
 
-## Step 0: Hiểu rõ yêu cầu
+## Step 0: Hiểu rõ yêu cầu & Check Macro
+
+Trước khi phân tích bất kỳ tài sản nào, luôn check:
+
+**Macro context hiện tại (cập nhật 19/03/2026):**
+- FED rate: **3.5-3.75%** (giữ nguyên 18/3/2026, hawkish)
+- Dự kiến FED cắt: **Q3/Q4 2026** → catalyst lớn cho CK, BNB
+- VIX: Đang cao → thị trường lo ngại → cơ hội tích lũy
+- Geopolitical: Trung Đông bất ổn → vàng được hỗ trợ
+
+**Tác động lên danh mục:**
+- 🟢 Mua tích lũy: MBB, S&P 500 ETF, Vàng (trước khi FED cắt)
+- ⏳ Hold: BNB, FPT (chờ macro cải thiện)
+- 🔴 Tránh thêm: VCB (P/E đắt), crypto mới
+
+Xem chi tiết trong `references/financial-analysis-knowledge.md` Section 9-10.
+
+---
 
 Xác định:
 - **Mục tiêu**: Tìm cổ phiếu mới? Phân tích mã cụ thể? Estimate lợi nhuận? Scan thị trường?
