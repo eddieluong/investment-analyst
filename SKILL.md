@@ -1,6 +1,6 @@
 ---
 name: vn-stock-analyst
-description: "Phân tích cổ phiếu thị trường chứng khoán Việt Nam (HOSE/HNX/UPCOM). Kết hợp phân tích kỹ thuật real-time (RSI, MACD, EMA, Bollinger Bands) từ TradingView với phân tích cơ bản (P/E, ROE, Sharpe, CAGR, định giá ngành). Luôn check valuation TRƯỚC khi đưa ra khuyến nghị. Use when: (1) user hỏi về giá cổ phiếu VN, (2) user muốn biết nên mua mã nào, (3) user hỏi về mã cụ thể, (4) user muốn phân tích ngành/lĩnh vực, (5) user hỏi về xu hướng VN-Index, (6) user muốn estimate lợi nhuận theo thời gian, (7) user muốn scan thị trường tìm cơ hội."
+description: "Phân tích và tư vấn đầu tư tài sản toàn cầu — cổ phiếu VN, US equities, vàng, crypto, DCA. Kết hợp phân tích kỹ thuật real-time (RSI, MACD, EMA, Bollinger Bands) từ TradingView với phân tích cơ bản (P/E, ROE, Sharpe, CAGR, định giá ngành). Use when: (1) user hỏi về giá cổ phiếu VN hoặc toàn cầu, (2) user muốn biết nên mua tài sản nào, (3) user hỏi về danh mục đầu tư, (4) user muốn tính DCA tích lũy hàng tháng, (5) user hỏi nên đầu tư bao nhiêu/tháng, (6) user muốn estimate lợi nhuận theo thời gian, (7) user muốn so sánh các loại tài sản toàn cầu, (8) user hỏi về vàng, crypto, S&P 500, ETF."
 ---
 
 # VN Stock Analyst
@@ -260,16 +260,23 @@ Vùng mua lý tưởng: [X,XXX – X,XXX VND]
 
 ## References
 
-- `references/sector-fundamentals.md` — P/E chuẩn, catalyst, risk từng ngành
-- `references/financial-analysis-knowledge.md` — Kiến thức RSI, MACD, P/E, Sharpe, lessons learned
+- `references/sector-fundamentals.md` — P/E chuẩn, catalyst, risk từng ngành VN
+- `references/financial-analysis-knowledge.md` — RSI, MACD, P/E, Sharpe, DCA, Global portfolio, lessons learned
 - `references/return-estimation.md` — Methodology estimate sinh lời
-- `references/posting-calendar.md` — (không liên quan, ignore)
 
 ## Scripts
 
 - `scripts/scan_market.py` — Scan toàn sàn tìm cơ hội
 - `scripts/analyze_stock.py` — Phân tích kỹ thuật sâu 1 mã
 - `scripts/estimate_returns.py` — Estimate lợi nhuận theo lịch sử
+- `scripts/dca_calculator.py` — Tính DCA tích lũy hàng tháng
+
+**DCA Calculator:**
+```bash
+python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/dca_calculator.py [monthly_vnd] [years]
+# Ví dụ: 2 triệu/tháng, 10 năm
+python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/dca_calculator.py 2000000 10
+```
 
 ---
 

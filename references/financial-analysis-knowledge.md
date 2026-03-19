@@ -360,3 +360,145 @@ Bước 5: SIZING
 ---
 
 *Tài liệu này được cập nhật liên tục trong quá trình phân tích thực tế. Mỗi lần học được điều mới → ghi vào đây.*
+
+---
+
+## 7. DCA — DOLLAR COST AVERAGING (Tích lũy hàng tháng)
+
+### 7.1 Tại sao DCA hiệu quả hơn Lump Sum?
+
+**Lump Sum** (bỏ vào một lần):
+- Rủi ro mua đúng đỉnh → lỗ ngay từ đầu
+- Cần vốn lớn ban đầu
+- Tâm lý khó: sợ mua sai thời điểm
+
+**DCA** (tích lũy hàng tháng):
+- Mua cả khi giá cao lẫn khi giá thấp → giá trung bình tối ưu
+- Không cần vốn lớn ban đầu
+- Tâm lý dễ: cứ mua đều đặn, không cần đoán thị trường
+- **Compounding effect bùng nổ từ năm 8-10 trở đi**
+
+### 7.2 Công thức tính DCA
+
+```python
+def dca_simulate(monthly_invest, annual_return, years):
+    monthly_return = (1 + annual_return) ** (1/12) - 1
+    total = 0
+    for month in range(years * 12):
+        total = (total + monthly_invest) * (1 + monthly_return)
+    invested = monthly_invest * 12 * years
+    return total, invested
+```
+
+### 7.3 Benchmark thực tế (1 triệu VND/tháng)
+
+| Thời gian | Đã bỏ vào | NH 5.5% | S&P 500 18% | VN tốt 30% | Mix 22% |
+|---|---|---|---|---|---|
+| 1 năm | 12tr | 12.4tr | 13.1tr | 13.9tr | 14.2tr |
+| 3 năm | 36tr | 39.1tr | 46.9tr | 55.3tr | 59.1tr |
+| 5 năm | 60tr | 69tr | 94tr | 125tr | 141tr |
+| 10 năm | 120tr | 159tr | 309tr | 591tr | 384tr |
+| 15 năm | 180tr | 277tr | 801tr | 2,321tr | 1,274tr |
+| 20 năm | 240tr | 431tr | 1,927tr | 8,742tr | 2,996tr |
+
+**Insight quan trọng:** Compound bùng nổ từ năm 10. Người bắt đầu sớm 5 năm = lợi thế khổng lồ.
+
+### 7.4 Quy tắc DCA
+
+1. **Mua ngày cố định hàng tháng** (VD: ngày 1 hoặc ngày lương) — không cần chọn thời điểm
+2. **Không dừng lại khi thị trường giảm** — đây là cơ hội mua rẻ hơn
+3. **Tăng gấp đôi khi thị trường giảm > 20%** — "sale" lớn nhất trong năm
+4. **Không tăng khi thị trường tăng mạnh** — tránh FOMO
+5. **Tái đầu tư cổ tức** — không rút ra, để compound
+
+### 7.5 Phân bổ DCA theo vốn hàng tháng
+
+**Danh mục DCA toàn cầu được đề xuất:**
+```
+S&P 500 ETF (VOO/IVV):    40% — Core, ổn định, dễ mua
+Cổ phiếu VN (MBB/TCB):   30% — Upside VN, nâng hạng thị trường
+Vàng (SJC/DOJI):          20% — Hedge, bảo toàn vốn
+Bitcoin:                   10% — High risk, long-term hold
+```
+
+**Nơi mua tại Việt Nam:**
+| Tài sản | Nơi mua | Tối thiểu |
+|---|---|---|
+| Vàng nhẫn | SJC/DOJI/PNJ | ~100k |
+| Cổ phiếu VN | VNDirect/SSI/MBS App | ~100k (lô lẻ) |
+| S&P 500 ETF | Exness, Interactive Brokers | $1 |
+| Bitcoin | Binance, OKX | $10 |
+
+### 7.6 Estimate theo mức tích lũy (10 năm, mix 22%/năm)
+
+| Tháng/tháng | Bỏ vào 10Y | Kết quả | Lãi ròng |
+|---|---|---|---|
+| 500k | 60tr | 192tr | +132tr |
+| 1tr | 120tr | 384tr | +264tr |
+| 2tr | 240tr | 767tr | +527tr |
+| 3tr | 360tr | 1.15 tỷ | +791tr |
+| 5tr | 600tr | 1.92 tỷ | +1.32 tỷ |
+
+### 7.7 Lesson: Bắt đầu sớm quan trọng hơn số tiền
+
+**Kịch bản A:** Bắt đầu 25 tuổi, 1tr/tháng, 30 năm → **~5.2 tỷ** (mix 22%)
+**Kịch bản B:** Bắt đầu 35 tuổi, 3tr/tháng, 20 năm → **~3 tỷ** (mix 22%)
+
+→ Dù B bỏ vào gấp 3 lần/tháng nhưng bắt đầu muộn 10 năm vẫn thua A.
+**"The best time to start was yesterday. The second best time is now."**
+
+---
+
+## 8. DANH MỤC ĐẦU TƯ TOÀN CẦU (Global Portfolio)
+
+### 8.1 Xếp hạng tài sản toàn cầu theo Sharpe (3 năm, Q1 2026)
+
+| Tài sản | CAGR | Sharpe | Max DD | Nhận xét |
+|---|---|---|---|---|
+| Vàng (XAU/USD) | +33.8% | **1.52** 🏆 | -14% | Best risk-adjusted globally |
+| MBB (VN Bank) | +41.3% | **1.16** ⭐ | -51% | VN best pick |
+| Nikkei 225 | +28.0% | 0.97 | -26% | Japan breakout khỏi deflation |
+| Nasdaq 100 | +23.9% | 0.93 | -24% | US tech stable |
+| S&P 500 | +18.9% | 0.91 | -19% | Safest core holding |
+| TCB (VN Bank) | +34.3% | 0.88 | -64% | High DD risk |
+| BAF (VN Agri) | +36.0% | 0.84 | -54% | Cyclical |
+| Bitcoin | +35.3% | 0.65 | -49% | High risk/reward |
+| VCB (VN Bank) | +7.5% | 0.08 | -35% | Underperform — tránh |
+
+### 8.2 Danh mục Global tối ưu cho investor VN
+
+**Conservative (ưu tiên an toàn):**
+```
+Vàng:         35% — Sharpe tốt nhất, hedge lạm phát
+S&P 500 ETF:  30% — Core ổn định
+Nikkei 225:   15% — Asia diversification
+MBB (VN):     10% — VN upside
+Bitcoin:      10% — Small crypto bet
+```
+
+**Balanced (cân bằng):**
+```
+Vàng:         25%
+S&P 500 ETF:  20%
+MBB (VN):     20%
+Nasdaq 100:   15%
+TCB/BAF (VN): 10%
+Bitcoin:      10%
+```
+
+**Aggressive (tối đa hóa return):**
+```
+MBB + TCB (VN): 35%
+Nasdaq 100:     25%
+Vàng:           20%
+Bitcoin:        15%
+S&P 500:         5%
+```
+
+### 8.3 Nguyên tắc diversification
+
+- **Không bỏ > 35% vào 1 tài sản** dù Sharpe có tốt đến đâu
+- **Kết hợp tài sản ít tương quan** (vàng thường ngược chiều cổ phiếu)
+- **Rebalance 6 tháng/lần** — cắt bớt tài sản tăng mạnh, mua thêm tài sản giảm
+- **Core + Satellite:** 60-70% tài sản ổn định (vàng, S&P 500) + 30-40% high growth
+
