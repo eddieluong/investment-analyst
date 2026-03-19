@@ -24,8 +24,9 @@ Trước khi phân tích bất kỳ tài sản nào, luôn check:
 **Macro context hiện tại (cập nhật 19/03/2026):**
 - FED rate: **3.5-3.75%** (giữ nguyên 18/3/2026, hawkish)
 - Dự kiến FED cắt: **Q3/Q4 2026** → catalyst lớn cho CK, BNB
-- VIX: Đang cao → thị trường lo ngại → cơ hội tích lũy
-- Geopolitical: Trung Đông bất ổn → vàng được hỗ trợ
+- **🔴 Iran War đang diễn ra** — Israel tấn công Iran, dầu WTI $95-99
+- Geopolitical risk CAO → Vàng được hỗ trợ mạnh, crypto áp lực
+- Dầu > $95 → lạm phát tăng → FED hawkish hơn → CK chịu áp lực
 
 **Tác động lên danh mục:**
 - 🟢 Mua tích lũy: MBB, S&P 500 ETF, Vàng (trước khi FED cắt)

@@ -674,3 +674,104 @@ INFLATION TĂNG:
 | VCB | 5% | Giảm mạnh (đắt, Sharpe tệ) |
 | Tiết kiệm | 6% | Emergency fund |
 
+
+---
+
+## 11. GEOPOLITICAL RISK — Biến Động Chính Trị Toàn Cầu
+
+### 11.1 Sự kiện nóng nhất 19/03/2026 — Iran War
+
+**Tình hình thực tế (AP News):**
+- Israel tấn công Iran: phá hủy kho dầu, nhà máy lọc dầu tại Tehran
+- Mỹ có 7 quân nhân thiệt mạng trong chiến tranh Iran
+- Iran đe dọa tấn công mục tiêu Mỹ thêm
+- Mojtaba Khamenei (con trai) vừa được bổ nhiệm Lãnh tụ Tối cao mới
+- Dầu WTI: **$95.77/thùng** (đang ở mức cao, dao động $94-99 hôm nay)
+
+**FED đã nhắc đến trong statement 18/3:** *"The implications of developments in the Middle East for the U.S. economy are uncertain"*
+
+### 11.2 Tác động Chiến tranh Iran lên Tài sản
+
+| Tài sản | Tác động | Lý do |
+|---|---|---|
+| **Dầu WTI/Brent** | 📈 Tăng mạnh | Iran = 3.5M thùng/ngày, Eo Hormuz rủi ro |
+| **Vàng** | 📈 Tăng | Safe haven, USD không chắc |
+| **S&P 500** | 📉 Giảm | Chi phí năng lượng tăng → lạm phát → FED hawkish hơn |
+| **Crypto** | 📉 Giảm | Risk-off sentiment |
+| **GAS (PV Gas VN)** | 📈 Tiềm năng | Giá dầu cao → doanh thu tăng |
+| **PLX (Petrolimex)** | 🔄 Neutral | Giá bán xăng điều chỉnh theo nhà nước |
+| **HPG (Hòa Phát)** | 📉 Áp lực | Chi phí năng lượng sản xuất tăng |
+| **Hàng không (HVN)** | 📉 Giảm | Nhiên liệu bay chiếm 30-40% chi phí |
+
+**Dầu $95-100+: Tác động chuỗi:**
+```
+Dầu tăng → Lạm phát tăng → FED giữ lãi suất cao hơn lâu hơn
+→ S&P 500 giảm → Tâm lý nhà đầu tư sợ → Crypto giảm → BNB giảm
+→ Nhưng: Vàng tăng, cổ phiếu dầu khí tăng
+```
+
+### 11.3 Hotspots Địa Chính Trị Cần Theo Dõi 2026
+
+| Khu vực | Sự kiện | Tài sản ảnh hưởng |
+|---|---|---|
+| **🔴 Trung Đông** | Israel-Iran war đang diễn ra | Dầu ↑, Vàng ↑, CK Mỹ ↓ |
+| **🔴 Đài Loan** | Căng thẳng Mỹ-Trung | Chip, tech ↓, Vàng ↑ |
+| **🟡 Ukraine-Nga** | Chiến tranh kéo dài | Khí đốt EU ↑, Lúa mì ↑ |
+| **🟡 Biển Đông** | Căng thẳng Việt Nam-TQ | VN-Index ↓ khi leo thang |
+| **🟢 Mỹ bầu cử 2026** | Midterm elections | Policy uncertainty |
+
+### 11.4 Framework Phân Tích Geopolitical Risk
+
+**Risk Level → Portfolio Action:**
+
+```
+🔴 HIGH RISK (chiến tranh lớn, sanctions mới):
+→ Tăng Vàng lên 20-25%
+→ Giảm Crypto về 5-8%
+→ Mua thêm dầu khí (GAS, PLX nếu ở VN)
+→ Giảm hàng không, tiêu dùng
+
+🟡 MEDIUM RISK (căng thẳng leo thang nhưng chưa chiến tranh):
+→ Giữ nguyên danh mục
+→ Tăng tỷ lệ cash/tiết kiệm lên 15%
+→ Tránh mở vị thế mới lớn
+
+🟢 LOW RISK (đàm phán, hòa giải):
+→ Giảm Vàng → tái phân bổ vào CK
+→ Mua thêm Crypto (risk-on)
+→ Tăng S&P 500
+```
+
+### 11.5 Tác động Cụ Thể lên Danh Mục Eddie
+
+**Với Iran War đang diễn ra:**
+
+| Tài sản Eddie | Tác động | Hành động |
+|---|---|---|
+| FPT | ⬇️ Nhẹ (sentiment) | Giữ nguyên |
+| MBB | ↔️ Neutral | Tiếp tục tích lũy |
+| VCB | ↔️ Neutral | Vẫn nên giảm (P/E đắt) |
+| BNB | ⬇️ Risk-off pressure | Giữ, không thêm |
+| **Vàng** *(chưa có)* | ⬆️ Strong buy | **Ưu tiên mua Vàng trước** |
+| **S&P 500** *(chưa có)* | ⬇️ Ngắn hạn | DCA bình thường, không panic |
+
+**Điều chỉnh kế hoạch tháng 3:**
+```
+Thay vì: MBB 10tr + Vàng 10tr
+Nên:     Vàng 13tr + MBB 7tr
+→ Ưu tiên Vàng cao hơn vì Iran War = geopolitical hedge cần thiết
+```
+
+### 11.6 Nguồn theo dõi Geopolitical News
+
+Fetch tự động từ:
+- **AP News Iran:** `https://apnews.com/hub/iran`
+- **AP News World:** `https://apnews.com/world-news`
+- **Dầu WTI real-time:** `https://stooq.com/q/l/?s=cl.f`
+- **Vàng real-time:** `https://stooq.com/q/l/?s=xauusd`
+
+**Ngưỡng cảnh báo dầu:**
+- WTI > $100: Cảnh báo lạm phát, FED sẽ hawkish hơn → giảm CK
+- WTI > $120: Khủng hoảng năng lượng → tăng Vàng mạnh
+- WTI < $70: Rủi ro giảm, có thể giảm Vàng
+
