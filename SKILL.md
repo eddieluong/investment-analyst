@@ -1,36 +1,57 @@
 ---
 name: vn-stock-analyst
-description: "Phân tích cổ phiếu thị trường chứng khoán Việt Nam (HOSE/HNX/UPCOM). Kết hợp phân tích kỹ thuật real-time (RSI, MACD, EMA, Bollinger Bands) từ TradingView với phân tích cơ bản (P/E, ROE, tăng trưởng ngành). Use when: (1) user asks about Vietnamese stock prices or analysis, (2) user wants to know which stocks to buy, (3) user asks about a specific stock ticker, (4) user wants sector/industry analysis for Vietnam market, (5) user asks about VN-Index trend."
+description: "Phân tích cổ phiếu thị trường chứng khoán Việt Nam (HOSE/HNX/UPCOM). Kết hợp phân tích kỹ thuật real-time (RSI, MACD, EMA, Bollinger Bands) từ TradingView với phân tích cơ bản (P/E, ROE, Sharpe, CAGR, định giá ngành). Luôn check valuation TRƯỚC khi đưa ra khuyến nghị. Use when: (1) user hỏi về giá cổ phiếu VN, (2) user muốn biết nên mua mã nào, (3) user hỏi về mã cụ thể, (4) user muốn phân tích ngành/lĩnh vực, (5) user hỏi về xu hướng VN-Index, (6) user muốn estimate lợi nhuận theo thời gian, (7) user muốn scan thị trường tìm cơ hội."
 ---
 
-# VN Stock Analyst Skill
+# VN Stock Analyst
 
-Analyze Vietnamese stocks (HOSE/HNX/UPCOM) using real-time technical data from TradingView combined with fundamental sector analysis.
+Phân tích cổ phiếu Việt Nam — kỹ thuật real-time + cơ bản + định giá + estimate sinh lời.
+
+## ⚠️ Nguyên tắc quan trọng nhất
+
+**CAGR lịch sử ≠ kỳ vọng từ giá hiện tại.**
+Luôn hỏi: *"Nếu mua HÔM NAY ở giá này, P/E là bao nhiêu? Còn rẻ không?"*
+
+Ví dụ: MCH CAGR 73%/năm từ đáy 30k → nhưng ở giá 161k hiện tại P/E ~37x là **đắt**.
+Sharpe 2.19 là lịch sử từ vùng giá thấp — không apply cho người mua hôm nay.
 
 ---
 
-## Step 1: Real-time Price Fetch (TradingView Scanner API)
+## Step 0: Hiểu rõ yêu cầu
 
-The TradingView scanner endpoint works **WITHOUT authentication**:
+Xác định:
+- **Mục tiêu**: Tìm cổ phiếu mới? Phân tích mã cụ thể? Estimate lợi nhuận? Scan thị trường?
+- **Thời gian nắm giữ**: Ngắn hạn (< 3 tháng), trung hạn (3-12 tháng), dài hạn (> 1 năm)
+- **Vốn**: Để estimate portfolio allocation và risk
+- **Khẩu vị rủi ro**: Bảo thủ / Cân bằng / Tích cực
 
+---
+
+## Step 1: Real-time Data (TradingView Scanner)
+
+TradingView scanner hoạt động **KHÔNG cần auth**:
+
+```bash
+# Scan toàn HOSE tìm oversold
+python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/scan_market.py --rsi 40 --exchange HOSE
+
+# Phân tích kỹ thuật sâu 1 mã
+python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/analyze_stock.py FPT HOSE
+
+# Estimate lợi nhuận theo thời gian
+python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/estimate_returns.py MBB
 ```
-POST https://scanner.tradingview.com/vietnam/scan
-Content-Type: application/json
-```
 
-### Fetch specific tickers:
-
+**Fetch thủ công nhiều mã:**
 ```python
 import urllib.request, json
 
 payload = {
-    "symbols": {"tickers": ["HOSE:FPT", "HOSE:VCB"]},
-    "columns": ["name","close","change","change_abs","volume","high","low","open",
-                "RSI","EMA20","EMA50","EMA200","MACD.macd","MACD.signal",
-                "BB.upper","BB.lower","ATR","Stoch.K","Stoch.D",
-                "price_52_week_high","price_52_week_low"]
+    "symbols": {"tickers": ["HOSE:MBB","HOSE:TCB","HOSE:FPT"]},
+    "columns": ["name","close","change","volume","RSI","EMA20","EMA50","EMA200",
+                "MACD.macd","MACD.signal","BB.upper","BB.lower",
+                "price_52_week_high","price_52_week_low","Stoch.K","Stoch.D"]
 }
-
 req = urllib.request.Request(
     "https://scanner.tradingview.com/vietnam/scan",
     data=json.dumps(payload).encode(),
@@ -41,169 +62,215 @@ with urllib.request.urlopen(req, timeout=10) as r:
     data = json.loads(r.read())
 ```
 
-### Scan full market for oversold stocks:
+---
 
+## Step 2: Phân tích Kỹ thuật
+
+Đọc từng chỉ báo theo thứ tự ưu tiên:
+
+### 1. EMA200 — Kiểm tra TRƯỚC TIÊN
+- `close > EMA200` ✅ → Long-term uptrend còn nguyên → **có thể xem xét mua**
+- `close < EMA200` ❌ → Downtrend dài hạn → **thận trọng, chỉ mua nếu có catalyst đặc biệt**
+
+**⚠️ Không mua cổ phiếu RSI oversold nhưng dưới EMA200** (FPT case: RSI 31 + -21% dưới EMA200 → TRÁNH)
+
+### 2. RSI(14)
+| RSI | Tín hiệu | Hành động |
+|---|---|---|
+| < 30 | 🟢🟢 Oversold cực mạnh | Xem xét mua mạnh nếu trên EMA200 |
+| 30–40 | 🟢 Oversold | DCA nếu trên EMA200 |
+| 40–60 | 🟡 Neutral | Giữ / chờ |
+| 60–70 | 🔴 Cận overbought | Không thêm vị thế |
+| > 70 | 🔴🔴 Overbought | Cân nhắc chốt lời |
+
+### 3. MACD
+- `macd > signal` → 🟢 Bullish momentum
+- `macd < signal` → 🔴 Bearish momentum
+- MACD vừa cắt lên signal ở vùng âm → **tín hiệu mua mạnh**
+
+### 4. Bollinger Bands
+- `close ≤ BB.lower` → Gần đáy dải → tiềm năng bounce
+- BB co lại (squeeze) → sắp biến động mạnh, chờ breakout
+
+### 5. Stochastic K/D
+- K < 20: Oversold | K > 80: Overbought
+- K cắt lên D ở vùng < 20 → mua signal
+
+### 6. 52W Position
+```
+pos52 = (close - low52w) / (high52w - low52w) × 100
+```
+- < 20%: Gần đáy 52W — vùng value tốt
+- > 80%: Gần đỉnh 52W — momentum cao nhưng rủi ro
+
+### 🎯 Buy Zone Score (tổng hợp)
 ```python
-payload = {
-    "filter": [
-        {"left": "RSI", "operation": "less", "right": 40},
-        {"left": "exchange", "operation": "in_range", "right": ["HOSE", "HNX"]}
-    ],
-    "columns": ["name","close","change","volume","RSI","EMA20","EMA50"],
-    "sort": {"sortBy": "RSI", "sortOrder": "asc"},
-    "range": [0, 20]
-}
+score = 0
+if rsi < 30: score += 3
+elif rsi < 40: score += 2
+if close > ema200: score += 2
+if pe_discount > 20%: score += 3  # P/E < Fair P/E - 20%
+elif pe_discount > 0: score += 2
+if pos52 < 20: score += 2
+elif pos52 < 40: score += 1
+if close <= bb_lower * 1.02: score += 2
+if macd > macd_signal: score += 1
+# Max: 15 điểm
+# ≥ 10: Mua mạnh | 7-9: DCA | 4-6: Theo dõi | < 4: Bỏ qua
 ```
-
-### Use scripts (preferred):
-
-For **market scan** (oversold opportunities):
-```bash
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/scan_market.py [--rsi 40] [--exchange HOSE] [--limit 20]
-```
-
-For **single stock deep analysis**:
-```bash
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/analyze_stock.py FPT [HOSE]
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/analyze_stock.py VCB HOSE
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/analyze_stock.py HPG HOSE
-```
-
-For **return estimation** (CAGR, scenarios, comparison):
-```bash
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/estimate_returns.py FPT
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/estimate_returns.py VCB --capital 100
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/estimate_returns.py HPG --capital 50 --years 3
-```
-
-Run these via `exec` tool. The scripts handle all API calls and signal computation.
 
 ---
 
-## Step 2: Technical Signal Interpretation
+## Step 3: Phân tích Định giá — BẮT BUỘC
 
-For each stock, compute and interpret these signals:
+**Không đưa ra khuyến nghị MUA nếu chưa check định giá.**
 
-### RSI (Relative Strength Index)
-- `RSI < 35` → 🟢 **Oversold** — potential buy
-- `RSI > 65` → 🔴 **Overbought** — consider taking profit
-- `35 ≤ RSI ≤ 65` → 🟡 **Neutral**
-
-### EMA Trend
-Compare `close` vs `EMA20`, `EMA50`, `EMA200`:
-- Above all 3 EMA → **Strong uptrend** ▲▲▲
-- Above EMA200 only → Long-term uptrend, short-term correction (accumulation zone)
-- Below all 3 EMA → **Strong downtrend** ▼▼▼
-
-### MACD
-- `macd > signal` → 🟢 **Bullish crossover**
-- `macd < signal` → 🔴 **Bearish crossover**
-
-### Bollinger Bands
-- `close ≤ BB.lower` → Price at lower band = **potential reversal** 🟢
-- `close ≥ BB.upper` → Price at upper band = **overbought zone** 🔴
-
-### Stochastic
-- `K < 20` → Oversold
-- `K > 80` → Overbought
-
-### 52-Week Position
+### P/E Analysis
 ```
-position = (close - low52w) / (high52w - low52w) * 100
+Upside = (Fair P/E - Current P/E) / Fair P/E × 100%
 ```
-- < 30% → Near 52W low (potential value zone)
-- > 70% → Near 52W high (momentum or resistance)
 
-### 🎯 Buy Zone Criteria (all 3 should be true)
-1. `RSI < 40` — Oversold
-2. `close > EMA200` — Long-term uptrend intact
-3. `close ≤ BB.lower × 1.03` — Near or below Bollinger lower band
+| Upside | Đánh giá |
+|---|---|
+| > 25% | 🟢 Rất rẻ — mua |
+| 10–25% | 🟡 Hơi rẻ — tích lũy |
+| 0–10% | 🟡 Hợp lý — OK |
+| < 0% | 🔴 Đắt — chờ điều chỉnh |
+| < -15% | 🔴🔴 Đắt nhiều — tránh |
+
+**Fair P/E theo ngành VN:**
+- Ngân hàng: 10–12x | Công nghệ: 20–25x | Thép: 8–12x
+- Tiêu dùng: 15–22x | BĐS: 12–18x | Dầu khí: 10–14x
+
+Xem chi tiết trong `references/sector-fundamentals.md`
+
+### Các chỉ số cơ bản khác
+- **ROE > 15%**: tốt | **> 20%**: xuất sắc
+- **D/E < 1.0**: ít nợ (ngân hàng ngoại lệ)
+- **FCF dương**: công ty sinh tiền thực
+- **EPS CAGR**: driver chính của giá dài hạn
+
+Xem framework đầy đủ trong `references/financial-analysis-knowledge.md`
 
 ---
 
-## Step 3: Fundamental Analysis Framework
+## Step 4: Phân tích Ngành & Catalyst
 
-Reference `references/sector-fundamentals.md` for sector-specific data.
+Reference `references/sector-fundamentals.md`.
 
-### Key metrics to discuss:
-| Metric | Good | Excellent |
-|--------|------|-----------|
-| **ROE** | > 15% | > 20% |
-| **P/E** | Compare to sector avg | Compare to historical |
-| **Revenue growth** | > 10% YoY | > 20% YoY |
-| **Debt/Equity** | < 1.0 | < 0.5 |
-| **Dividend yield** | > 3% | > 5% |
+Luôn trả lời:
+1. **Ngành đang ở đâu trong chu kỳ?** (tăng trưởng / đỉnh / suy thoái / đáy)
+2. **Catalyst 1-3 năm tới là gì?**
+3. **Rủi ro chính là gì?**
 
-Always contextualize P/E against sector average (see `references/sector-fundamentals.md`).
+**Catalyst chung cho VN 2026-2028:**
+- Nâng hạng thị trường FTSE/MSCI → vốn ngoại đổ vào
+- Lãi suất giảm → P/E hợp lý cao hơn, BĐS phục hồi
+- Đầu tư công tăng → thép, vật liệu xây dựng
+- Chuyển đổi số → FPT, tech
+- GDP 6-7%/năm → ngân hàng, tiêu dùng
 
 ---
 
-## Step 4: Return Estimation (Ước tính Lợi nhuận)
+## Step 5: Estimate Sinh lời
 
-Reference `references/return-estimation.md` for full methodology. Use `scripts/estimate_returns.py` to automate.
-
-### Quick run:
 ```bash
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/estimate_returns.py FPT
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/estimate_returns.py VCB --capital 100
-python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/estimate_returns.py HPG --capital 50 --years 3
+python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/estimate_returns.py [TICKER] [--capital X] [--years N]
 ```
 
-### What the script computes:
-1. **Fetches 5 years daily price history** from VNDirect dChart API (no auth required)
-2. **Historical metrics**: 3M/6M/1Y return, 3Y/5Y CAGR, annual volatility, max drawdown, Sharpe Ratio
-3. **Three scenarios** based on historical CAGR ± volatility:
-   - 🐻 **Bear**: `max(5.5%, CAGR₃ᵧ − 1σ)` — pessimistic
-   - 📊 **Base**: `CAGR₃ᵧ` — mean reversion
-   - 🐂 **Bull**: `CAGR₃ᵧ + 0.5σ` — optimistic
-4. **Comparison table**: vs. bank deposit (5.5%/yr) and VN-Index (~11%/yr)
-5. **Risk label** based on Sharpe Ratio
+Script tính từ VNDirect historical data:
+- **CAGR** 3Y/5Y (tỷ lệ tăng trưởng kép)
+- **Volatility** hàng năm (độ biến động)
+- **Max Drawdown** (mức giảm tối đa từ đỉnh)
+- **Sharpe Ratio** (return/risk)
+- **3 kịch bản** Bear/Base/Bull × 6M/1Y/3Y/5Y
 
-### When fetching fails (VNDirect down):
-Use manual estimation based on sector CAGR from `references/sector-fundamentals.md`:
-- Banking blue chips: ~12–15%/năm (Base)
-- Technology (FPT): ~20%/năm (Base)
-- Steel (HPG): ~10–18%/năm cyclical, high volatility
-- Consumer (VNM): ~8–12%/năm, lower risk
+**⚠️ Luôn nhắc user:**
+- CAGR lịch sử là từ giá VÀO của quá khứ, không phải từ giá hiện tại
+- Nếu P/E hiện tại đã cao → estimate thực tế thấp hơn CAGR lịch sử
+- So sánh với: gửi ngân hàng 5.5%/năm và VN-Index ~11%/năm
+
+Xem phương pháp đầy đủ trong `references/return-estimation.md`
 
 ---
 
-## Step 5: Output Format
+## Step 6: Portfolio Allocation
 
-Always structure your analysis as:
+Khi user hỏi nên phân bổ vốn như thế nào:
+
+### Sizing theo Sharpe
+| Sharpe | Tỷ trọng tối đa |
+|---|---|
+| > 1.5 | 35% |
+| 1.0–1.5 | 25% |
+| 0.5–1.0 | 15% |
+| < 0.5 | 10% |
+
+### Sizing theo Max Drawdown
+| Max DD | Tỷ trọng tối đa |
+|---|---|
+| < 30% | 30% |
+| 30–50% | 20% |
+| 50–70% | 10% |
+| > 70% | 5% |
+
+### DCA Strategy
+- Không all-in một lúc
+- Chia 3–5 lần mua trong 4–8 tuần
+- Mua thêm khi RSI giảm về vùng oversold
+
+---
+
+## Step 7: Output Format
 
 ```
-## 📊 [TICKER] — [Company Name]
-Giá: X,XXX VND | Hôm nay: +/-X.XX%
-Volume: XM cổ phiếu
+## 📊 [TICKER] — [Tên công ty]
+Giá: X,XXX VND | Hôm nay: +/-X.XX% | Volume: XM
 
 ### Kỹ thuật
-RSI: XX.X [signal emoji]
-Trend: EMA20 [▲/▼] | EMA50 [▲/▼] | EMA200 [▲/▼]
-MACD: [🟢 Bullish / 🔴 Bearish]
-Bollinger: [position relative to bands]
-52W: High X,XXX | Low X,XXX | Vị trí: XX%
+- RSI: XX.X [tín hiệu]
+- EMA200: X,XXX [▲ Trên / ▼ Dưới] — [Long-term uptrend / Downtrend]
+- MACD: [🟢 Bullish / 🔴 Bearish]
+- Bollinger: [vị trí]
+- 52W: High X,XXX | Low X,XXX | Vị trí: XX%
+- Score: X/15
 
-### Cơ bản
-Ngành: [sector name]
-P/E: XX.Xx (ngành: XX-XXx)
-ROE: XX%
-[Other relevant fundamentals]
-Tiềm năng: [key growth drivers]
-Rủi ro: [key risks]
+### Định giá
+- P/E hiện tại: XX.Xx (Fair: XX-XXx)
+- Upside định giá: +/-XX%
+- ROE: XX% | D/E: XX
+
+### Cơ bản & Ngành
+- Ngành: [tên]
+- Catalyst: [1-2 điểm chính]
+- Rủi ro: [1-2 điểm chính]
+
+### Estimate (Base case)
+- 1 năm: +/-XX% (~Xtr từ 10tr)
+- 3 năm: +/-XX% (~Xtr từ 10tr)
+- Sharpe: X.XX | Max DD: -XX%
 
 ### Kết luận
-[🟢 VÙNG MUA TỐT / 🟡 THEO DÕI / ⏳ CHỜ THÊM / 🔴 TRÁNH]
-[1-2 sentence reasoning]
+[🟢 MUA / 🟡 THEO DÕI / ⏳ CHỜ / 🔴 TRÁNH]
+Lý do: [1-2 câu ngắn gọn]
+Vùng mua lý tưởng: [X,XXX – X,XXX VND]
 ```
 
 ---
 
-## Tips & Notes
+## References
 
-- **Exchange prefixes**: HOSE (Ho Chi Minh), HNX (Hanoi), UPCOM
-- **Ticker format for API**: `HOSE:FPT`, `HNX:SHB`, etc.
-- **VN-Index**: Use ticker `VNINDEX` on HOSE exchange
-- **Market hours**: 9:00–11:30 and 13:00–15:00 ICT (UTC+7), Mon–Fri
-- **Always mention**: This is analysis assistance, not financial advice. Do your own research (DYOR).
-- For sector-specific insights, always reference `references/sector-fundamentals.md`
+- `references/sector-fundamentals.md` — P/E chuẩn, catalyst, risk từng ngành
+- `references/financial-analysis-knowledge.md` — Kiến thức RSI, MACD, P/E, Sharpe, lessons learned
+- `references/return-estimation.md` — Methodology estimate sinh lời
+- `references/posting-calendar.md` — (không liên quan, ignore)
+
+## Scripts
+
+- `scripts/scan_market.py` — Scan toàn sàn tìm cơ hội
+- `scripts/analyze_stock.py` — Phân tích kỹ thuật sâu 1 mã
+- `scripts/estimate_returns.py` — Estimate lợi nhuận theo lịch sử
+
+---
+
+*⚠️ Phân tích mang tính tham khảo, không phải khuyến nghị đầu tư. DYOR.*
