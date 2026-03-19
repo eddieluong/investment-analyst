@@ -502,3 +502,105 @@ S&P 500:         5%
 - **Rebalance 6 tháng/lần** — cắt bớt tài sản tăng mạnh, mua thêm tài sản giảm
 - **Core + Satellite:** 60-70% tài sản ổn định (vàng, S&P 500) + 30-40% high growth
 
+
+---
+
+## 9. MACRO FACTORS — FED, LÃI SUẤT, TÂM LÝ NHÀ ĐẦU TƯ
+
+### 9.1 FED & FOMC
+
+**FOMC họp 8 lần/năm** — quyết định lãi suất Fed Funds Rate (FFR).
+Lịch 2026: Jan, **Mar 17-18**, Apr 28-29, Jun 16-17, Jul, Sep, Oct, Dec
+
+**FED Statement mới nhất — 18/03/2026:**
+- ✅ **GIỮ NGUYÊN lãi suất 3.5% – 3.75%**
+- Kinh tế vẫn tăng trưởng ổn định
+- Lạm phát vẫn "somewhat elevated" — chưa đủ điều kiện cắt giảm
+- Rủi ro Trung Đông tạo bất ổn
+- 1 thành viên (Miran) muốn cắt -0.25% nhưng bị phủ quyết
+- **Tín hiệu:** FED không vội cắt lãi suất → neutral/hawkish
+
+**Tại sao thị trường giảm hôm nay (19/3)?**
+FED giữ nguyên nhưng thị trường kỳ vọng tín hiệu cắt giảm sớm hơn → thất vọng → bán tháo.
+
+### 9.2 Tác động lãi suất lên từng tài sản
+
+| Lãi suất | Cổ phiếu | Vàng | Crypto | Trái phiếu | VND |
+|---|---|---|---|---|---|
+| **Tăng** | 📉 Giảm (P/E compression) | 📉 Giảm | 📉 Giảm mạnh | 📉 Giảm | 📈 Mạnh lên |
+| **Giữ** | 🔄 Neutral | 🔄 Neutral | 🔄 Neutral | 🔄 Neutral | 🔄 Neutral |
+| **Giảm** | 📈 Tăng | 📈 Tăng | 📈 Tăng mạnh | 📈 Tăng | 📉 Yếu đi |
+
+**FFR hiện tại: 3.5-3.75%**
+Market kỳ vọng cắt lần đầu: Q3/Q4 2026
+→ Nếu FED cắt lãi suất → P/E hợp lý cao hơn → CK tăng
+
+### 9.3 Fear & Greed Index — Tâm lý thị trường
+
+**Nguồn:** CNN Fear & Greed Index (0-100)
+- 0-25: **Extreme Fear** 🔴 → thường là đáy, cơ hội mua
+- 25-45: **Fear** 🟡
+- 45-55: **Neutral** ⬜
+- 55-75: **Greed** 🟢
+- 75-100: **Extreme Greed** 🔴 → thường là đỉnh, cẩn thận
+
+**Lesson:** Warren Buffett: *"Be fearful when others are greedy, and greedy when others are fearful"*
+
+**VIX — Volatility Index (Fear gauge của S&P 500)**
+- VIX < 15: Thị trường bình tĩnh, tự tin
+- VIX 15-25: Lo ngại trung bình
+- VIX > 30: Sợ hãi → thường là cơ hội mua
+- VIX > 40: Khủng hoảng → mua mạnh nếu có tiền
+
+### 9.4 Lịch sự kiện macro quan trọng cần theo dõi
+
+| Sự kiện | Tần suất | Tác động |
+|---|---|---|
+| FOMC Meeting | 8 lần/năm | ⭐⭐⭐⭐⭐ Lớn nhất |
+| CPI (Lạm phát Mỹ) | Hàng tháng | ⭐⭐⭐⭐ |
+| Non-Farm Payrolls (Việc làm Mỹ) | Thứ 6 đầu tháng | ⭐⭐⭐⭐ |
+| GDP Mỹ | Hàng quý | ⭐⭐⭐ |
+| Kết quả kinh doanh (Earnings Season) | Hàng quý | ⭐⭐⭐ |
+| NHNN VN họp | 2 lần/năm | ⭐⭐⭐ (cho VN stocks) |
+| Địa chính trị (Trung Đông, Đài Loan) | Bất định | ⭐⭐⭐ |
+
+### 9.5 Lãi suất Việt Nam
+
+**NHNN Việt Nam:**
+- Lãi suất điều hành hiện tại: ~4.5%
+- Lãi suất huy động ngân hàng: 4.5-5.5%/năm
+- Xu hướng: Giảm nhẹ theo FED để hỗ trợ tăng trưởng
+
+**Tác động lãi suất VN giảm:**
+- ✅ Ngân hàng: NIM cải thiện, chi phí vốn thấp hơn → lợi nhuận tăng → MBB, TCB, VCB hưởng lợi
+- ✅ BĐS: Người mua vay dễ hơn → VHM, DXG tăng
+- ✅ Cổ phiếu nói chung: Định giá P/E hợp lý cao hơn
+
+### 9.6 Phân tích Tâm lý Nhà đầu tư (Sentiment Analysis)
+
+**Chỉ số cần theo dõi:**
+1. **VIX** (fear gauge Mỹ) — ảnh hưởng gián tiếp VN
+2. **Margin debt** — nhà đầu tư dùng đòn bẩy nhiều = thị trường quá nóng
+3. **Put/Call ratio** — > 1.2 = nhiều người mua put (hedge/bear) → cơ hội mua
+4. **Short interest** — cổ phiếu bị short nhiều, nếu tin tốt → short squeeze
+5. **Insider buying** — ban lãnh đạo tự mua cổ phiếu công ty = tín hiệu mạnh
+
+**Cho VN thêm:**
+- **Khối ngoại mua ròng/bán ròng** (HOSE daily data)
+- **Margin call pressure** khi thị trường giảm mạnh
+- **Thanh khoản thị trường** — khối lượng giao dịch giảm = ít nhà đầu tư tham gia
+
+### 9.7 Tác động Trực tiếp lên Danh mục Eddie
+
+**FED giữ 3.5-3.75% (hôm nay):**
+- S&P 500, Nasdaq giảm → tác động tâm lý lan sang VN, crypto
+- BNB giảm tiếp vì crypto nhạy cảm với lãi suất cao
+- FPT giảm một phần do sentiment toàn cầu
+
+**Nếu FED cắt lãi suất (dự kiến Q3/Q4 2026):**
+- BNB có thể bật mạnh (crypto lên khi USD yếu)
+- MBB/TCB hưởng lợi (ngân hàng VN)
+- S&P 500 tăng → portfolio mix cải thiện
+
+**→ Chiến lược: Tích lũy MBB + S&P 500 ETF hiện tại, chờ FED cắt lãi suất = catalyst chính**
+
