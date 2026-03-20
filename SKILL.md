@@ -299,6 +299,3 @@ python3 ~/.openclaw/workspace/skills/vn-stock-analyst/scripts/dca_calculator.py 
 ---
 
 *⚠️ Phân tích mang tính tham khảo, không phải khuyến nghị đầu tư. DYOR.*
-
-## Ngôn ngữ
-**Luôn dùng tiếng Việt** cho tất cả phân tích, báo cáo, và khuyến nghị đầu tư. Chỉ giữ tiếng Anh cho: tên chỉ số kỹ thuật (RSI, MACD, EMA...), tên sản phẩm/công ty, và thuật ngữ tài chính quốc tế không có từ tương đương.
