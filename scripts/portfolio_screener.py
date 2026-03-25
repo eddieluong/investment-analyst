@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Portfolio Screener — Scan thị trường → đề xuất danh mục mới tối ưu.
+Portfolio Screener — Scan markets → recommend new optimal portfolio.
 
-Scan TradingView tìm top assets theo score, phân bổ theo risk profile.
+Scan TradingView for top assets by score, allocate by risk profile.
 
 Usage:
   python3 portfolio_screener.py --capital 500000000 --risk balanced --markets vn,us,crypto,gold --horizon medium
@@ -19,24 +19,24 @@ RF_RATE = 0.055  # risk-free VN
 
 ALLOCATION_TEMPLATES = {
     "conservative": {
-        "label": "🛡️ Bảo thủ (Conservative)",
-        "description": "Ưu tiên bảo toàn vốn, tăng trưởng ổn định",
+        "label": "🛡️ Conservative",
+        "description": "Prioritize capital preservation, stable growth",
         "allocation": {
-            "bonds_cash": 0.50,    # Trái phiếu / tiền gửi
-            "blue_chip": 0.30,     # Blue chip ổn định
-            "gold": 0.15,          # Vàng phòng hộ
-            "crypto": 0.05,        # Crypto nhỏ
+            "bonds_cash": 0.50,    # Bonds / deposits
+            "blue_chip": 0.30,     # Stable blue chips
+            "gold": 0.15,          # Gold hedge
+            "crypto": 0.05,        # Small crypto
         },
         "expected_return": {"bear": 0.04, "base": 0.08, "bull": 0.12},
         "max_single": 0.15,
     },
     "balanced": {
-        "label": "⚖️ Cân bằng (Balanced)",
-        "description": "Cân bằng tăng trưởng và ổn định",
+        "label": "⚖️ Balanced",
+        "description": "Balance growth and stability",
         "allocation": {
             "blue_chip": 0.30,     # Blue chip
             "growth": 0.25,        # Growth stocks
-            "gold": 0.20,          # Vàng
+            "gold": 0.20,          # Gold
             "etf": 0.15,           # ETF
             "crypto": 0.10,        # Crypto
         },
@@ -44,14 +44,14 @@ ALLOCATION_TEMPLATES = {
         "max_single": 0.20,
     },
     "aggressive": {
-        "label": "🔥 Tích cực (Aggressive)",
-        "description": "Tối đa tăng trưởng, chấp nhận rủi ro cao",
+        "label": "🔥 Aggressive",
+        "description": "Maximize growth, accept high risk",
         "allocation": {
             "growth": 0.35,        # Growth stocks
             "crypto": 0.25,        # Crypto
-            "midcap": 0.20,        # Midcap tiềm năng
+            "midcap": 0.20,        # Potential midcap
             "forex_commodities": 0.15,  # Forex & Commodities
-            "commodities": 0.05,   # Commodities khác
+            "commodities": 0.05,   # Other commodities
         },
         "expected_return": {"bear": -0.05, "base": 0.20, "bull": 0.40},
         "max_single": 0.25,
@@ -61,11 +61,11 @@ ALLOCATION_TEMPLATES = {
 # ── Horizon configs ──
 
 HORIZON_CONFIGS = {
-    "short": {"label": "Ngắn hạn (< 3 tháng)", "prefer_liquid": True, "dca_months": 1,
+    "short": {"label": "Short-term (< 3 months)", "prefer_liquid": True, "dca_months": 1,
               "weight_momentum": 0.6, "weight_value": 0.2, "weight_trend": 0.2},
-    "medium": {"label": "Trung hạn (3-12 tháng)", "prefer_liquid": False, "dca_months": 3,
+    "medium": {"label": "Medium-term (3-12 months)", "prefer_liquid": False, "dca_months": 3,
                "weight_momentum": 0.3, "weight_value": 0.4, "weight_trend": 0.3},
-    "long": {"label": "Dài hạn (> 1 năm)", "prefer_liquid": False, "dca_months": 6,
+    "long": {"label": "Long-term (> 1 year)", "prefer_liquid": False, "dca_months": 6,
              "weight_momentum": 0.1, "weight_value": 0.5, "weight_trend": 0.4},
 }
 
@@ -74,7 +74,7 @@ HORIZON_CONFIGS = {
 MARKET_SCANNERS = {
     "vn": {
         "url": "https://scanner.tradingview.com/vietnam/scan",
-        "label": "🇻🇳 Cổ phiếu Việt Nam",
+        "label": "🇻🇳 Vietnamese Stocks",
         "categories": ["blue_chip", "growth", "midcap"],
         "filter_blue_chip": {
             "filter": [
@@ -160,7 +160,7 @@ MARKET_SCANNERS = {
     },
     "gold": {
         "url": "https://scanner.tradingview.com/cfd/scan",
-        "label": "🥇 Vàng & Kim loại quý",
+        "label": "🥇 Gold & Precious Metals",
         "categories": ["gold"],
         "filter_gold": {
             "symbols": {"tickers": ["TVC:GOLD", "TVC:SILVER", "AMEX:GLD", "AMEX:IAU", "AMEX:SLV"]},
@@ -187,12 +187,12 @@ def fetch_scanner(url, payload, timeout=15):
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read())
     except Exception as e:
-        print(f"  ⚠️ Lỗi kết nối: {e}")
+        print(f"  ⚠️ Connection error: {e}")
         return {"data": []}
 
 
 def score_asset(d, columns, horizon_config):
-    """Score an asset 0-15 dựa trên technical indicators."""
+    """Score an asset 0-15 based on technical indicators."""
     col_map = {c: i for i, c in enumerate(columns)}
 
     def get(name):
@@ -221,7 +221,7 @@ def score_asset(d, columns, horizon_config):
     # RSI score
     if rsi is not None:
         if rsi < 30:
-            score += 3; reasons.append(f"RSI cực oversold ({rsi:.0f})")
+            score += 3; reasons.append(f"RSI extreme oversold ({rsi:.0f})")
         elif rsi < 40:
             score += 2; reasons.append(f"RSI oversold ({rsi:.0f})")
         elif rsi > 70:
@@ -230,9 +230,9 @@ def score_asset(d, columns, horizon_config):
     # EMA200 trend
     if close and ema200:
         if close > ema200:
-            score += 2; reasons.append("Trên EMA200 ✓")
+            score += 2; reasons.append("Above EMA200 ✓")
         else:
-            score -= 1; reasons.append("Dưới EMA200 ✗")
+            score -= 1; reasons.append("Below EMA200 ✗")
 
     # MACD
     if macd is not None and macd_sig is not None:
@@ -241,22 +241,22 @@ def score_asset(d, columns, horizon_config):
 
     # Bollinger
     if close and bb_lower and close <= bb_lower * 1.02:
-        score += 2; reasons.append("Gần BB Lower")
+        score += 2; reasons.append("Near BB Lower")
 
     # 52W position
     if h52 and l52 and h52 != l52:
         pos52 = (close - l52) / (h52 - l52) * 100
         if pos52 < 20:
-            score += 2; reasons.append(f"Gần đáy 52W ({pos52:.0f}%)")
+            score += 2; reasons.append(f"Near 52W low ({pos52:.0f}%)")
         elif pos52 < 40:
             score += 1
 
     # P/E value (for stocks)
     if pe is not None and pe > 0:
         if pe < 10:
-            score += 2; reasons.append(f"P/E rất rẻ ({pe:.1f})")
+            score += 2; reasons.append(f"Very cheap P/E ({pe:.1f})")
         elif pe < 15:
-            score += 1; reasons.append(f"P/E hợp lý ({pe:.1f})")
+            score += 1; reasons.append(f"Fair P/E ({pe:.1f})")
         elif pe > 40:
             score -= 1
 
@@ -277,7 +277,7 @@ def score_asset(d, columns, horizon_config):
 
 
 def scan_market(market_key, category, limit=15):
-    """Scan một market category."""
+    """Scan a market category."""
     config = MARKET_SCANNERS[market_key]
     url = config["url"]
     columns = config["columns"]
@@ -366,16 +366,16 @@ def fmt_price(value, currency="VND"):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Portfolio Screener — Scan & Đề xuất danh mục mới")
-    parser.add_argument("--capital", "-c", type=float, required=True, help="Tổng vốn (VND)")
+    parser = argparse.ArgumentParser(description="Portfolio Screener — Scan & Recommend New Portfolio")
+    parser.add_argument("--capital", "-c", type=float, required=True, help="Total capital (VND)")
     parser.add_argument("--risk", "-r", choices=["conservative", "balanced", "aggressive"],
-                        default="balanced", help="Khẩu vị rủi ro (mặc định: balanced)")
+                        default="balanced", help="Risk appetite (default: balanced)")
     parser.add_argument("--markets", "-m", default="vn,us,crypto,gold",
-                        help="Thị trường: vn,us,crypto,gold (mặc định: tất cả)")
+                        help="Markets: vn,us,crypto,gold (mặc định: tất cả)")
     parser.add_argument("--horizon", "-t", choices=["short", "medium", "long"],
-                        default="medium", help="Thời gian đầu tư (mặc định: medium)")
+                        default="medium", help="Investment horizon (default: medium)")
     parser.add_argument("--limit", "-l", type=int, default=10,
-                        help="Số mã tối đa mỗi category (mặc định: 10)")
+                        help="Max tickers per category (default: 10)")
     args = parser.parse_args()
 
     capital = args.capital
@@ -388,23 +388,23 @@ def main():
     horizon_cfg = HORIZON_CONFIGS[horizon]
 
     print(f"\n{'='*80}")
-    print(f"  🔍 PORTFOLIO SCREENER — Scan Thị Trường & Đề Xuất Danh Mục Mới")
-    print(f"  Vốn: {fmt_vnd(capital)} | Risk: {template['label']}")
-    print(f"  Thị trường: {', '.join(markets)} | Horizon: {horizon_cfg['label']}")
-    print(f"  Thời gian: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    print(f"  🔍 PORTFOLIO SCREENER — Market Scan & New Portfolio Recommendation")
+    print(f"  Capital: {fmt_vnd(capital)} | Risk: {template['label']}")
+    print(f"  Markets: {', '.join(markets)} | Horizon: {horizon_cfg['label']}")
+    print(f"  Time: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
     print(f"{'='*80}")
 
     print(f"\n  📝 {template['description']}")
-    print(f"\n  Phân bổ mục tiêu:")
+    print(f"\n  Target allocation:")
     for cat, pct in template["allocation"].items():
         cat_labels = {
-            "bonds_cash": "📦 Trái phiếu/Tiền gửi",
+            "bonds_cash": "📦 Bonds/Deposits",
             "blue_chip": "🏛️ Blue Chip",
             "growth": "🚀 Growth Stocks",
-            "gold": "🥇 Vàng",
+            "gold": "🥇 Gold",
             "crypto": "🪙 Crypto",
             "etf": "📈 ETF",
-            "midcap": "📊 Midcap tiềm năng",
+            "midcap": "📊 Potential Midcap",
             "forex_commodities": "💱 Forex & Commodities",
             "commodities": "🛢️ Commodities",
         }
@@ -416,18 +416,18 @@ def main():
 
     for market in markets:
         if market not in MARKET_SCANNERS:
-            print(f"\n  ⚠️ Thị trường '{market}' không hỗ trợ. Bỏ qua.")
+            print(f"\n  ⚠️ Market '{market}' not supported. Skipping.")
             continue
 
         mkt_config = MARKET_SCANNERS[market]
         print(f"\n{'─'*80}")
-        print(f"  ⏳ Đang scan {mkt_config['label']}...")
+        print(f"  ⏳ Scanning {mkt_config['label']}...")
 
         for category in mkt_config["categories"]:
             results, columns = scan_market(market, category, limit)
 
             if not results:
-                print(f"     {category}: không có kết quả")
+                print(f"     {category}: no results")
                 continue
 
             scored = []
@@ -461,7 +461,7 @@ def main():
 
     # ── Build recommended portfolio ──
     print(f"\n{'='*80}")
-    print(f"  🎯 DANH MỤC ĐỀ XUẤT")
+    print(f"  🎯 RECOMMENDED PORTFOLIO")
     print(f"{'='*80}")
 
     portfolio = []  # [(ticker, weight_pct, category, reason, metrics, market)]
@@ -472,12 +472,12 @@ def main():
     # Map allocation categories to scanned categories
     category_mapping = {
         "bonds_cash": {"source": None, "fixed": [
-            ("BOND_VN", "Trái phiếu/Tiền gửi VN 6-7%/năm"),
+            ("BOND_VN", "Bonds/Deposits VN 6-7%/năm"),
         ]},
         "blue_chip": {"source": "blue_chip"},
         "growth": {"source": "growth"},
         "gold": {"source": "gold", "fixed": [
-            ("XAUUSD", "Vàng phòng hộ lạm phát & rủi ro"),
+            ("XAUUSD", "Gold phòng hộ lạm phát & rủi ro"),
         ]},
         "crypto": {"source": "crypto"},
         "etf": {"source": "etf", "fallback_fixed": [
@@ -486,11 +486,11 @@ def main():
         ]},
         "midcap": {"source": "midcap"},
         "forex_commodities": {"source": None, "fixed": [
-            ("XAUUSD", "Vàng — safe haven"),
-            ("WTI", "Dầu — hưởng lợi Iran tensions"),
+            ("XAUUSD", "Gold — safe haven"),
+            ("WTI", "Oil — benefits from Iran tensions"),
         ]},
         "commodities": {"source": None, "fixed": [
-            ("WTI", "Dầu WTI — commodity exposure"),
+            ("WTI", "WTI Oil — commodity exposure"),
         ]},
     }
 
@@ -539,7 +539,7 @@ def main():
 
     cat_labels = {
         "bonds_cash": "📦 Trái phiếu", "blue_chip": "🏛️ Blue Chip",
-        "growth": "🚀 Growth", "gold": "🥇 Vàng", "crypto": "🪙 Crypto",
+        "growth": "🚀 Growth", "gold": "🥇 Gold", "crypto": "🪙 Crypto",
         "etf": "📈 ETF", "midcap": "📊 Midcap",
         "forex_commodities": "💱 Forex/Comm", "commodities": "🛢️ Commodities",
     }
@@ -563,17 +563,17 @@ def main():
 
     # ── Expected Returns ──
     print(f"\n{'─'*80}")
-    print(f"  📈 EXPECTED RETURN (ước tính)")
+    print(f"  📈 EXPECTED RETURN (estimated)")
     print(f"{'─'*80}")
 
     exp = template["expected_return"]
 
-    print(f"\n  Danh mục tổng hợp:")
+    print(f"\n  Combined portfolio:")
     print(f"     Expected Return:  {total_est_return*100:+.1f}%/năm")
     print(f"     Volatility (est): {total_est_vol*100:.1f}%/năm")
     print(f"     Sharpe Ratio:     {est_sharpe:.2f}")
 
-    print(f"\n  Kịch bản lợi nhuận:")
+    print(f"\n  Return scenarios:")
     for years in [1, 3, 5]:
         bear_v = capital * (1 + exp["bear"]) ** years
         base_v = capital * (1 + exp["base"]) ** years
@@ -585,62 +585,62 @@ def main():
 
     # ── DCA Schedule ──
     print(f"\n{'─'*80}")
-    print(f"  📅 LỊCH DCA GỢI Ý")
+    print(f"  📅 SUGGESTED DCA SCHEDULE")
     print(f"{'─'*80}")
 
     dca_months = horizon_cfg["dca_months"]
     n_batches = max(2, min(6, int(dca_months * 2)))
     batch_amount = capital / n_batches
 
-    print(f"\n  Chia {n_batches} đợt mua, mỗi đợt ~{fmt_vnd(batch_amount)}")
+    print(f"\n  Chia {n_batches} purchase batches, each ~{fmt_vnd(batch_amount)}")
     print(f"  Horizon: {horizon_cfg['label']}")
     print()
 
     if horizon == "short":
         print(f"  📌 Đợt 1 (Tuần 1):  Mua 50% — ưu tiên mã có RSI < 40")
         print(f"  📌 Đợt 2 (Tuần 2):  Mua 50% còn lại")
-        print(f"\n  ⚡ Ngắn hạn: vào nhanh, cut loss nhanh (SL -5%)")
+        print(f"\n  ⚡ Short-term: enter fast, cut loss fast (SL -5%)")
     elif horizon == "medium":
         for batch in range(1, n_batches + 1):
             week = batch * 2
             pct = 100 / n_batches
             if batch == 1:
-                note = "Blue chip + Gold trước"
+                note = "Blue chip + Gold first"
             elif batch == n_batches:
-                note = "Growth + Crypto cuối"
+                note = "Growth + Crypto last"
             else:
-                note = "Chia đều các mã"
+                note = "Spread evenly across tickers"
             print(f"  📌 Đợt {batch} (Tuần {week}):  ~{fmt_vnd(batch_amount)} ({pct:.0f}%) — {note}")
-        print(f"\n  💡 Mua thêm khi RSI giảm < 35. Tránh mua khi RSI > 65.")
+        print(f"\n  💡 Buy more when RSI drops below 35. Avoid buying when RSI > 65.")
     else:  # long
         months = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6"]
         priorities = [
             "Blue chip VN + US ETF",
             "Thêm Growth stocks",
-            "Vàng + Bonds",
+            "Gold + Bonds",
             "Crypto (nếu RSI < 40)",
-            "Midcap tiềm năng",
+            "Potential Midcap",
             "Cân bằng lại, mua thêm mã yếu",
         ]
         for i in range(min(n_batches, 6)):
             print(f"  📌 {months[i]}:  ~{fmt_vnd(batch_amount)} — {priorities[i]}")
-        print(f"\n  💡 Dài hạn: kiên nhẫn, mua đều đặn, review mỗi quý.")
+        print(f"\n  💡 Long-term: be patient, buy consistently, review quarterly.")
 
     # ── Risk warnings ──
     print(f"\n{'─'*80}")
-    print(f"  ⚠️ LƯU Ý QUAN TRỌNG")
+    print(f"  ⚠️ IMPORTANT NOTES")
     print(f"{'─'*80}")
     print(f"""
-  1. Phân bổ trên là GỢI Ý dựa trên dữ liệu kỹ thuật real-time
-  2. CAGR lịch sử ≠ kỳ vọng tương lai (đặc biệt ở giá hiện tại)
-  3. Nên research thêm fundamentals trước khi mua
-  4. Luôn có stop loss cho mỗi vị thế
-  5. Review danh mục mỗi tháng, rebalance mỗi quý
-  6. Không all-in — DCA là bạn tốt nhất
+  1. The above allocation is a SUGGESTION based on real-time technical data
+  2. Historical CAGR ≠ future expectation (especially at current price)
+  3. Research fundamentals further before buying
+  4. Always have a stop loss for each position
+  5. Review portfolio monthly, rebalance quarterly
+  6. Don't go all-in — DCA is your best friend
 """)
 
     print(f"{'='*80}")
-    print(f"  ⚠️ Phân tích mang tính tham khảo, không phải khuyến nghị đầu tư. DYOR.")
+    print(f"  ⚠️ Analysis is for reference only, not investment advice. DYOR.")
     print(f"{'='*80}\n")
 
 

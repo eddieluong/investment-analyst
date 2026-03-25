@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Portfolio Optimizer — Phân tích danh mục hiện có → đề xuất rebalance tối ưu.
+Portfolio Optimizer — Analyze existing portfolio → recommend optimal rebalance.
 
-Fetch real-time data từ TradingView, tính toán Markowitz Mean-Variance optimization.
+Fetch real-time data from TradingView, compute Markowitz Mean-Variance optimization.
 
 Usage:
   python3 portfolio_optimizer.py --portfolio "MBB:30,FPT:25,GOLD:20,BNB:15,CASH:10" --capital 500000000 --risk balanced
@@ -63,9 +63,9 @@ ASSET_MAP = {
 
 # Special non-tradeable assets
 SPECIAL_ASSETS = {
-    "CASH": {"type": "cash", "return": 0.055, "volatility": 0.005, "label": "Tiền mặt/Gửi ngân hàng"},
-    "BOND": {"type": "bond", "return": 0.065, "volatility": 0.02, "label": "Trái phiếu VN"},
-    "SAVINGS": {"type": "cash", "return": 0.055, "volatility": 0.002, "label": "Tiết kiệm"},
+    "CASH": {"type": "cash", "return": 0.055, "volatility": 0.005, "label": "Cash/Bank deposit"},
+    "BOND": {"type": "bond", "return": 0.065, "volatility": 0.02, "label": "VN Bonds"},
+    "SAVINGS": {"type": "cash", "return": 0.055, "volatility": 0.002, "label": "Savings"},
     "USBOND": {"type": "bond", "return": 0.045, "volatility": 0.05, "label": "US Treasury"},
 }
 
@@ -93,7 +93,7 @@ def get_columns(market):
 
 RISK_PROFILES = {
     "conservative": {
-        "label": "🛡️ Bảo thủ (Conservative)",
+        "label": "🛡️ Conservative",
         "max_single": 0.25,
         "max_equity": 0.40,
         "max_crypto": 0.05,
@@ -102,7 +102,7 @@ RISK_PROFILES = {
         "target_sharpe": 0.8,
     },
     "balanced": {
-        "label": "⚖️ Cân bằng (Balanced)",
+        "label": "⚖️ Balanced",
         "max_single": 0.30,
         "max_equity": 0.60,
         "max_crypto": 0.15,
@@ -111,7 +111,7 @@ RISK_PROFILES = {
         "target_sharpe": 1.0,
     },
     "aggressive": {
-        "label": "🔥 Tích cực (Aggressive)",
+        "label": "🔥 Aggressive",
         "max_single": 0.35,
         "max_equity": 0.80,
         "max_crypto": 0.25,
@@ -125,7 +125,7 @@ RF_RATE = 0.055  # risk-free rate VN
 
 
 def fetch_tradingview_data(tickers_map):
-    """Fetch data cho nhiều assets từ TradingView. tickers_map: {ticker: (market, tv_symbol)}"""
+    """Fetch data for multiple assets from TradingView. tickers_map: {ticker: (market, tv_symbol)}"""
     # Group by market endpoint
     by_market = {}
     for ticker, (market, tv_sym) in tickers_map.items():
@@ -154,7 +154,7 @@ def fetch_tradingview_data(tickers_map):
             with urllib.request.urlopen(req, timeout=15) as r:
                 data = json.loads(r.read())
         except Exception as e:
-            print(f"  ⚠️ Lỗi fetch {market}: {e}")
+            print(f"  ⚠️ Fetch error {market}: {e}")
             continue
 
         for item in data.get("data", []):
@@ -198,7 +198,7 @@ def fetch_tradingview_data(tickers_map):
 
 
 def classify_asset(ticker, market=None):
-    """Phân loại asset."""
+    """Classify asset."""
     if ticker in SPECIAL_ASSETS:
         return SPECIAL_ASSETS[ticker]["type"]
     if market == "crypto":
@@ -215,7 +215,7 @@ def classify_asset(ticker, market=None):
 
 
 def estimate_annual_return(data):
-    """Estimate annual return từ TradingView perf data."""
+    """Estimate annual return from TradingView perf data."""
     if data is None:
         return 0.0
     perf_1y = data.get("perf_1y")
@@ -266,7 +266,7 @@ def calc_portfolio_metrics(weights, returns, vols, corr_matrix):
 
 
 def estimate_correlation(types_i, types_j):
-    """Estimate correlation giữa 2 asset classes."""
+    """Estimate correlation between 2 asset classes."""
     if types_i == types_j:
         return 0.85  # same asset class → high correlation
     corr_table = {
@@ -293,7 +293,7 @@ def estimate_correlation(types_i, types_j):
 
 
 def build_correlation_matrix(asset_types):
-    """Build correlation matrix dựa trên asset class."""
+    """Build correlation matrix based on asset class."""
     n = len(asset_types)
     matrix = [[0.0] * n for _ in range(n)]
     for i in range(n):
@@ -428,7 +428,7 @@ def parse_portfolio(portfolio_str):
 
     total = sum(w for _, w in items)
     if abs(total - 100) > 1:
-        print(f"  ⚠️ Tổng tỷ trọng = {total}% (nên = 100%). Sẽ chuẩn hóa.")
+        print(f"  ⚠️ Total weight = {total}% (should = 100%). Will normalize.")
         if total > 0:
             items = [(t, w / total * 100) for t, w in items]
     return items
@@ -451,13 +451,13 @@ def fmt_pct(value):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Portfolio Optimizer — Phân tích & Rebalance danh mục")
+    parser = argparse.ArgumentParser(description="Portfolio Optimizer — Portfolio Analysis & Rebalance")
     parser.add_argument("--portfolio", "-p", required=True,
-                        help='Danh mục: "MBB:30,FPT:25,GOLD:20,BNB:15,CASH:10" (mã:tỷ trọng%%)')
+                        help='Portfolio: "MBB:30,FPT:25,GOLD:20,BNB:15,CASH:10" (ticker:weight%%)')
     parser.add_argument("--capital", "-c", type=float, required=True,
-                        help="Tổng vốn (VND)")
-    parser.add_argument("--risk", "-r", choices=["conservative", "balanced", "aggressive"],
-                        default="balanced", help="Khẩu vị rủi ro (mặc định: balanced)")
+                        help="Total capital (VND)")
+    parser.add_argument("--risk", "-r", forices=["conservative", "balanced", "aggressive"],
+                        default="balanced", help="Risk appetite (default: balanced)")
     args = parser.parse_args()
 
     portfolio = parse_portfolio(args.portfolio)
@@ -470,13 +470,13 @@ def main():
     weights = [w / 100.0 for w in weights_pct]
 
     print(f"\n{'='*75}")
-    print(f"  📊 PORTFOLIO OPTIMIZER — Phân tích & Đề xuất Rebalance")
-    print(f"  Vốn: {fmt_vnd(capital)} | Risk Profile: {profile['label']}")
-    print(f"  Thời gian: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    print(f"  📊 PORTFOLIO OPTIMIZER — Analysis & Rebalance Recommendation")
+    print(f"  Capital: {fmt_vnd(capital)} | Risk Profile: {profile['label']}")
+    print(f"  Time: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
     print(f"{'='*75}")
 
     # ── Fetch data ──
-    print(f"\n⏳ Đang fetch dữ liệu real-time từ TradingView...")
+    print(f"\n⏳ Fetching real-time data from TradingView...")
 
     # Build fetch map (skip special assets)
     fetch_map = {}
@@ -516,7 +516,7 @@ def main():
             asset_types.append(atype)
             asset_data.append(d)
         else:
-            print(f"  ⚠️ Không tìm thấy dữ liệu cho {ticker}, dùng giá trị mặc định")
+            print(f"  ⚠️ Data not found for {ticker}, using default values")
             asset_returns.append(0.08)
             asset_vols.append(0.25)
             asset_types.append("equity")
@@ -531,10 +531,10 @@ def main():
         weights, asset_returns, asset_vols, corr_matrix)
 
     print(f"\n{'─'*75}")
-    print(f"  📋 1. DANH MỤC HIỆN TẠI")
+    print(f"  📋 1. CURRENT PORTFOLIO")
     print(f"{'─'*75}")
 
-    print(f"\n  {'Mã':<10} {'Tỷ trọng':>9} {'Giá trị':>14} {'Return 1Y':>10} {'Vol':>8} {'RSI':>6} {'Loại':<12}")
+    print(f"\n  {'Mã':<10} {'Weight':>9} {'Value':>14} {'Return 1Y':>10} {'Vol':>8} {'RSI':>6} {'Type':<12}")
     print(f"  {'─'*70}")
 
     for i in range(n):
@@ -545,13 +545,13 @@ def main():
         vol_str = f"{asset_vols[i]*100:.1f}%"
         rsi_str = f"{asset_data[i]['rsi']:.0f}" if asset_data[i].get('rsi') else "—"
         type_labels = {
-            "equity": "Cổ phiếu", "crypto": "Crypto", "commodity": "Hàng hóa",
-            "bond": "Trái phiếu", "cash": "Tiền mặt", "forex": "Forex",
+            "equity": "Equity", "crypto": "Crypto", "commodity": "Commodity",
+            "bond": "Bond", "cash": "Cash", "forex": "Forex",
         }
         type_str = type_labels.get(asset_types[i], asset_types[i])
         print(f"  {ticker:<10} {w:>8.1f}% {fmt_vnd(value):>14} {ret_str:>10} {vol_str:>8} {rsi_str:>6} {type_str:<12}")
 
-    print(f"\n  📈 Tổng quan danh mục:")
+    print(f"\n  📈 Portfolio summary:")
     print(f"     Expected Return:   {port_return*100:+.1f}%/năm")
     print(f"     Volatility:        {port_vol*100:.1f}%/năm")
     print(f"     Sharpe Ratio:      {port_sharpe:.2f}")
@@ -559,7 +559,7 @@ def main():
 
     # ── 2. Diagnostics ──
     print(f"\n{'─'*75}")
-    print(f"  🔍 2. ĐÁNH GIÁ DANH MỤC")
+    print(f"  🔍 2. PORTFOLIO ASSESSMENT")
     print(f"{'─'*75}")
 
     issues = []
@@ -568,7 +568,7 @@ def main():
     # Check concentration
     for i in range(n):
         if weights[i] > profile["max_single"]:
-            issues.append(f"⚠️ {tickers[i]} chiếm {weights_pct[i]:.0f}% — vượt giới hạn {profile['max_single']*100:.0f}% cho {risk}")
+            issues.append(f"⚠️ {tickers[i]} takes {weights_pct[i]:.0f}% — exceeds limit {profile['max_single']*100:.0f}% for {risk}")
 
     # Check asset class balance
     equity_w = sum(w for w, t in zip(weights, asset_types) if t == "equity")
@@ -577,22 +577,22 @@ def main():
     commodity_w = sum(w for w, t in zip(weights, asset_types) if t == "commodity")
 
     if equity_w > profile["max_equity"]:
-        issues.append(f"⚠️ Cổ phiếu chiếm {equity_w*100:.0f}% — vượt giới hạn {profile['max_equity']*100:.0f}%")
+        issues.append(f"⚠️ Equity takes {equity_w*100:.0f}% — exceeds limit {profile['max_equity']*100:.0f}%")
     if crypto_w > profile["max_crypto"]:
-        issues.append(f"⚠️ Crypto chiếm {crypto_w*100:.0f}% — vượt giới hạn {profile['max_crypto']*100:.0f}%")
+        issues.append(f"⚠️ Crypto takes {crypto_w*100:.0f}% — exceeds limit {profile['max_crypto']*100:.0f}%")
     if safe_w < profile["min_safe"]:
-        issues.append(f"⚠️ Tài sản an toàn chỉ {safe_w*100:.0f}% — cần tối thiểu {profile['min_safe']*100:.0f}%")
+        issues.append(f"⚠️ Safe assets only {safe_w*100:.0f}% — needs at least {profile['min_safe']*100:.0f}%")
 
     # Check diversification
     unique_types = set(asset_types)
     if len(unique_types) < 3:
-        issues.append(f"⚠️ Chỉ có {len(unique_types)} loại tài sản — thiếu đa dạng hóa")
+        issues.append(f"⚠️ Chỉ có {len(unique_types)} asset types — lacking diversification")
     if n < 4:
-        issues.append(f"⚠️ Chỉ có {n} mã — nên có ít nhất 4-5 mã")
+        issues.append(f"⚠️ Chỉ có {n} tickers — should have at least 4-5")
 
     # Check volatility vs target
     if port_vol > profile["target_vol"] * 1.3:
-        issues.append(f"⚠️ Volatility {port_vol*100:.0f}% cao hơn mục tiêu {profile['target_vol']*100:.0f}% cho {risk}")
+        issues.append(f"⚠️ Volatility {port_vol*100:.0f}% higher than target {profile['target_vol']*100:.0f}% for {risk}")
 
     # Check individual assets
     for i in range(n):
@@ -601,26 +601,26 @@ def main():
         ema200 = d.get("ema200")
         close = d.get("close")
         if rsi and rsi > 70:
-            suggestions.append(f"📌 {tickers[i]} RSI={rsi:.0f} — overbought, cân nhắc giảm tỷ trọng")
+            suggestions.append(f"📌 {tickers[i]} RSI={rsi:.0f} — overbought, consider reducing allocation")
         if close and ema200 and close < ema200:
-            suggestions.append(f"📌 {tickers[i]} đang dưới EMA200 — downtrend, thận trọng")
+            suggestions.append(f"📌 {tickers[i]} below EMA200 — downtrend, be cautious")
         if rsi and rsi < 30 and close and ema200 and close > ema200:
-            suggestions.append(f"📌 {tickers[i]} RSI={rsi:.0f} oversold + trên EMA200 — cơ hội tích lũy")
+            suggestions.append(f"📌 {tickers[i]} RSI={rsi:.0f} oversold + above EMA200 — accumulation opportunity")
 
     if issues:
-        print(f"\n  🔴 Vấn đề phát hiện:")
+        print(f"\n  🔴 Issues detected:")
         for issue in issues:
             print(f"     {issue}")
     else:
-        print(f"\n  🟢 Danh mục tuân thủ giới hạn risk profile {risk}")
+        print(f"\n  🟢 Portfolio complies with risk profile limits {risk}")
 
     if suggestions:
-        print(f"\n  💡 Gợi ý từ phân tích kỹ thuật:")
+        print(f"\n  💡 Suggestions from technical analysis:")
         for sug in suggestions:
             print(f"     {sug}")
 
     # Correlation matrix display
-    print(f"\n  📊 Ma trận tương quan (ước tính):")
+    print(f"\n  📊 Correlation matrix (estimated):")
     print(f"     {'':>8}", end="")
     for t in tickers:
         print(f" {t:>7}", end="")
@@ -634,7 +634,7 @@ def main():
 
     # ── 3. Rebalance Optimization ──
     print(f"\n{'─'*75}")
-    print(f"  🎯 3. ĐỀ XUẤT REBALANCE (Markowitz Mean-Variance)")
+    print(f"  🎯 3. REBALANCE RECOMMENDATION (Markowitz Mean-Variance)")
     print(f"{'─'*75}")
 
     opt_weights, opt_sharpe = optimize_markowitz(
@@ -643,7 +643,7 @@ def main():
     opt_return, opt_vol, opt_sharpe = calc_portfolio_metrics(
         opt_weights, asset_returns, asset_vols, corr_matrix)
 
-    print(f"\n  {'Mã':<10} {'Hiện tại':>9} {'Đề xuất':>9} {'Thay đổi':>9} {'Giá trị mới':>14} {'Hành động':<15}")
+    print(f"\n  {'Mã':<10} {'Current':>9} {'Proposed':>9} {'Change':>9} {'Value mới':>14} {'Action':<15}")
     print(f"  {'─'*70}")
 
     for i in range(n):
@@ -653,20 +653,20 @@ def main():
         new_val = capital * opt_weights[i]
 
         if diff > 2:
-            action = f"🟢 Tăng +{diff:.0f}%"
+            action = f"🟢 Increase +{diff:.0f}%"
         elif diff < -2:
-            action = f"🔴 Giảm {diff:.0f}%"
+            action = f"🔴 Decrease {diff:.0f}%"
         else:
-            action = "⚪ Giữ nguyên"
+            action = "⚪ Keep"
 
         print(f"  {tickers[i]:<10} {old_w:>8.1f}% {new_w:>8.1f}% {diff:>+8.1f}% {fmt_vnd(new_val):>14} {action}")
 
-    # ── 4. So sánh trước/sau ──
+    # ── 4. Before/after comparison ──
     print(f"\n{'─'*75}")
-    print(f"  📊 4. SO SÁNH TRƯỚC / SAU REBALANCE")
+    print(f"  📊 4. BEFORE / AFTER REBALANCE COMPARISON")
     print(f"{'─'*75}")
 
-    print(f"\n  {'Chỉ số':<25} {'Trước':>12} {'Sau':>12} {'Thay đổi':>12}")
+    print(f"\n  {'Metric':<25} {'Before':>12} {'After':>12} {'Change':>12}")
     print(f"  {'─'*55}")
     print(f"  {'Expected Return':<25} {port_return*100:>+11.1f}% {opt_return*100:>+11.1f}% {(opt_return-port_return)*100:>+11.1f}%")
     print(f"  {'Volatility':<25} {port_vol*100:>11.1f}% {opt_vol*100:>11.1f}% {(opt_vol-port_vol)*100:>+11.1f}%")
@@ -681,15 +681,15 @@ def main():
     old_sf = sum(w for w, t in zip(weights, asset_types) if t in ("cash", "bond", "commodity")) * 100
     new_sf = sum(w for w, t in zip(opt_weights, asset_types) if t in ("cash", "bond", "commodity")) * 100
 
-    print(f"\n  {'Phân bổ theo loại':<25} {'Trước':>12} {'Sau':>12}")
+    print(f"\n  {'Allocation by type':<25} {'Before':>12} {'After':>12}")
     print(f"  {'─'*45}")
-    print(f"  {'Cổ phiếu':<25} {old_eq:>11.0f}% {new_eq:>11.0f}%")
+    print(f"  {'Equity':<25} {old_eq:>11.0f}% {new_eq:>11.0f}%")
     print(f"  {'Crypto':<25} {old_cr:>11.0f}% {new_cr:>11.0f}%")
-    print(f"  {'An toàn (cash/bond/gold)':<25} {old_sf:>11.0f}% {new_sf:>11.0f}%")
+    print(f"  {'Safe (cash/bond/gold)':<25} {old_sf:>11.0f}% {new_sf:>11.0f}%")
 
-    # ── 5. Kịch bản lợi nhuận ──
+    # ── 5. Return scenarios ──
     print(f"\n{'─'*75}")
-    print(f"  💰 5. KỊCH BẢN LỢI NHUẬN (sau rebalance)")
+    print(f"  💰 5. RETURN SCENARIOS (after rebalance)")
     print(f"{'─'*75}")
 
     for years in [1, 3, 5]:
@@ -701,17 +701,17 @@ def main():
         base_v = capital * (1 + base_r) ** years
         bull_v = capital * (1 + bull_r) ** years
 
-        print(f"\n  📅 {years} năm (vốn {fmt_vnd(capital)}):")
+        print(f"\n  📅 {years} years (capital {fmt_vnd(capital)}):")
         print(f"     🐻 Bear:  {fmt_vnd(bear_v)} ({(bear_v/capital-1)*100:+.1f}%)")
         print(f"     📊 Base:  {fmt_vnd(base_v)} ({(base_v/capital-1)*100:+.1f}%)")
         print(f"     🐂 Bull:  {fmt_vnd(bull_v)} ({(bull_v/capital-1)*100:+.1f}%)")
 
     # ── 6. Action plan ──
     print(f"\n{'─'*75}")
-    print(f"  🎬 6. KẾ HOẠCH THỰC HIỆN")
+    print(f"  🎬 6. IMPLEMENTATION PLAN")
     print(f"{'─'*75}")
 
-    print(f"\n  Chia rebalance thành 2-3 đợt trong 2-4 tuần:")
+    print(f"\n  Split rebalance into 2-3 batches over 2-4 weeks:")
     rebalance_actions = []
     for i in range(n):
         old_val = capital * weights[i]
@@ -719,19 +719,19 @@ def main():
         diff_val = new_val - old_val
         if abs(diff_val) > capital * 0.02:  # >2% change
             if diff_val > 0:
-                rebalance_actions.append((tickers[i], "MUA thêm", diff_val))
+                rebalance_actions.append((tickers[i], "BUY more", diff_val))
             else:
-                rebalance_actions.append((tickers[i], "BÁN bớt", abs(diff_val)))
+                rebalance_actions.append((tickers[i], "SELL some", abs(diff_val)))
 
     if rebalance_actions:
         for ticker, action, val in rebalance_actions:
             print(f"     → {action} {ticker}: ~{fmt_vnd(val)}")
     else:
-        print(f"     ✅ Danh mục đã khá cân bằng, không cần rebalance lớn.")
+        print(f"     ✅ Portfolio is fairly balanced, no major rebalance needed.")
 
     print(f"\n{'='*75}")
-    print(f"  ⚠️ Phân tích mang tính tham khảo. Correlation & volatility là ước tính.")
-    print(f"  📌 Rebalance nên thực hiện 1-2 lần/quý để giảm phí giao dịch.")
+    print(f"  ⚠️ Analysis is for reference. Correlation & volatility are estimates.")
+    print(f"  📌 Rebalance should be done 1-2 times/quarter to minimize trading fees.")
     print(f"{'='*75}\n")
 
 
